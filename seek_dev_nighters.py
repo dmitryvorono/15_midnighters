@@ -1,15 +1,39 @@
-def load_attempts():
-    pages = 1
-    for page in range(pages):
-        # FIXME подключить загрузку данных из API
-        yield {
-            'username': 'bob',
-            'timestamp': 0,
-            'timezone': 'Europe/Moscow',
-        }
+import requests
+from datetime import datetime
+from pytz import timezone
+import pprint
 
-def get_midnighters():
-    pass
+
+def fetch_solution_attempts(page):
+    request = requests.get('https://devman.org/api/challenges/solution_attempts/?page={0}'.format(page))
+    if request.status_code == requests.codes.ok:
+        return request.json()
+
+
+def load_attempts(start_page):
+    content = fetch_solution_attempts(start_page)
+    for page in range(start_page, content['number_of_pages']+1):
+        yield content['records']
+        content = fetch_solution_attempts(page+1)
+
+
+def get_midnighters(attempts):
+    def is_owl(attempt):
+        if attempt['timestamp'] is None:
+            return False
+        client_tz = attempt['timezone']
+        server_time = datetime.utcfromtimestamp(int(attempt['timestamp']))
+        client_time = timezone(client_tz).fromutc(server_time)
+        return client_time.hour == 0
+    return list(filter(is_owl, attempts))
+
+
+def print_midnighters(attempts):
+    if attempts:
+        pprint.pprint(attempts, indent=4)
+
 
 if __name__ == '__main__':
-  pass
+    l = load_attempts(1)
+    for i in l:
+        print_midnighters(get_midnighters(i))
