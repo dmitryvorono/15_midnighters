@@ -11,10 +11,13 @@ def fetch_solution_attempts(page):
 
 
 def load_attempts(start_page):
-    content = fetch_solution_attempts(start_page)
-    for page in range(start_page, content['number_of_pages']+1):
+    page = start_page
+    while True:
+        content = fetch_solution_attempts(page)
+        if content is None:
+            break
         yield content['records']
-        content = fetch_solution_attempts(page+1)
+        page += 1
 
 
 def get_midnighters(attempts):
