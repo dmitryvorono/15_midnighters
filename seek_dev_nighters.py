@@ -10,14 +10,15 @@ def fetch_solution_attempts(page):
         return request.json()
 
 
-def load_attempts(start_page, delta=1):
-    page = start_page
-    while True:
+def load_attempts(start_page):
+    content = fetch_solution_attempts(start_page)
+    if content is None:
+        return
+    yield content['records']
+    number_of_pages = content['number_of_pages']
+    for page in range(start_page + 1, number_of_pages + 1):
         content = fetch_solution_attempts(page)
-        if content is None:
-            break
         yield content['records']
-        page += delta
 
 
 def get_midnighters(attempts):
