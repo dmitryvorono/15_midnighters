@@ -38,6 +38,6 @@ def print_midnighters(attempts):
 
 if __name__ == '__main__':
     start_page = 1
-    l = load_attempts(start_page)
-    for i in l:
-        print_midnighters(get_midnighters(i))
+    attempts_generator = load_attempts(start_page)
+    for attempts in attempts_generator:
+        print_midnighters(get_midnighters(attempts))
