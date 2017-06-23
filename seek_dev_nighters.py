@@ -21,15 +21,17 @@ def load_attempts(start_page):
         yield content['records']
 
 
+def is_owl(attempt):
+    if attempt['timestamp'] is None:
+        return False
+    client_tz = attempt['timezone']
+    server_time = datetime.utcfromtimestamp(int(attempt['timestamp']))
+    client_time = timezone(client_tz).fromutc(server_time)
+    return client_time.hour == 0
+
+
 def get_midnighters(attempts):
-    def is_owl(attempt):
-        if attempt['timestamp'] is None:
-            return False
-        client_tz = attempt['timezone']
-        server_time = datetime.utcfromtimestamp(int(attempt['timestamp']))
-        client_time = timezone(client_tz).fromutc(server_time)
-        return client_time.hour == 0
-    return list(filter(is_owl, attempts))
+    return [attempt for attempt in attempts if is_owl(attempt)]
 
 
 def print_midnighters(attempts):
