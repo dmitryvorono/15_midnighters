@@ -10,14 +10,14 @@ def fetch_solution_attempts(page):
         return request.json()
 
 
-def load_attempts(start_page):
+def load_attempts(start_page, delta=1):
     page = start_page
     while True:
         content = fetch_solution_attempts(page)
         if content is None:
             break
         yield content['records']
-        page += 1
+        page += delta
 
 
 def get_midnighters(attempts):
@@ -37,6 +37,7 @@ def print_midnighters(attempts):
 
 
 if __name__ == '__main__':
-    l = load_attempts(1)
+    start_page = 1
+    l = load_attempts(start_page)
     for i in l:
         print_midnighters(get_midnighters(i))
